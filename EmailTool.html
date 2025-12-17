@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Template Builder</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; padding: 20px; }
+        .header { background: linear-gradient(135deg, #ff6b35 0%, #ff8c42 100%); color: white; padding: 30px; border-radius: 12px; margin-bottom: 30px; text-align: center; }
+        .header h1 { font-size: 28px; margin-bottom: 8px; }
+        .header p { opacity: 0.9; font-size: 14px; }
+        .container { max-width: 1400px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+        @media (max-width: 1024px) { .container { grid-template-columns: 1fr; } }
+        .panel { background: white; border-radius: 12px; padding: 28px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
+        .panel h2 { font-size: 20px; font-weight: 700; margin-bottom: 24px; color: #111827; }
+        .form-group { margin-bottom: 18px; }
+        label { display: block; font-size: 12px; font-weight: 700; color: #374151; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+        input, textarea, select { width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 14px; font-family: inherit; transition: all 0.2s; }
+        input:focus, textarea:focus, select:focus { outline: none; border-color: #ff6b35; box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1); }
+        textarea { resize: vertical; min-height: 100px; }
+        .btn { display: inline-flex; align-items: center; justify-content: center; padding: 12px 20px; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+        .btn-primary { background: #ff6b35; color: white; width: 100%; }
+        .btn-primary:hover { background: #ff8c42; }
+        .btn-secondary { background: #e5e7eb; color: #111827; }
+        .btn-secondary:hover { background: #d1d5db; }
+        .btn-small { padding: 8px 12px; font-size: 12px; width: auto; }
+        .btn-group { display: flex; gap: 8px; margin-top: 12px; }
+        .section-title { font-size: 16px; font-weight: 700; color: #111827; margin-top: 28px; margin-bottom: 14px; padding-top: 24px; border-top: 2px solid #e5e7eb; }
+        .card-item { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 14px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; transition: all 0.2s; }
+        .card-item:hover { border-color: #ff6b35; background: #fff9f6; }
+        .card-content { flex: 1; }
+        .card-item strong { display: block; color: #111827; font-size: 14px; margin-bottom: 4px; }
+        .card-item p { margin: 0; font-size: 12px; color: #6b7280; }
+        .remove-btn { background: #fee2e2; color: #b91c1c; border: none; padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600; transition: all 0.2s; }
+        .remove-btn:hover { background: #fecaca; }
+        .preview { background: #f5f5f5; border-radius: 12px; padding: 24px; max-height: 700px; overflow-y: auto; }
+        .preview-title { font-size: 14px; font-weight: 700; color: #111827; margin-bottom: 16px; }
+        .email-preview { background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .preview-header { background: linear-gradient(135deg, #ff6b35 0%, #ff8c42 100%); color: white; padding: 20px; text-align: center; }
+        .preview-header h3 { font-size: 18px; margin-bottom: 8px; }
+        .preview-header p { font-size: 12px; opacity: 0.9; }
+        .preview-content { padding: 20px; }
+        .preview-section { margin-bottom: 20px; }
+        .preview-section h4 { font-size: 14px; font-weight: 700; color: #111827; margin-bottom: 8px; }
+        .preview-section p { font-size: 12px; color: #6b7280; line-height: 1.6; }
+        .template-selector { margin-bottom: 24px; }
+        .tabs { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+        .tab-btn { padding: 8px 16px; border: 2px solid #e5e7eb; background: white; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600; transition: all 0.2s; }
+        .tab-btn.active { border-color: #ff6b35; background: #fff9f6; color: #ff6b35; }
+        .export-btn { background: #10b981; color: white; }
+        .export-btn:hover { background: #059669; }
+        .success-msg { background: #dcfce7; border: 1px solid #bbf7d0; color: #15803d; padding: 12px 16px; border-radius: 8px; margin-bottom: 16px; font-size: 13px; display: none; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>✉️ Email Template Builder</h1>
+        <p>Create professional email templates in seconds</p>
+    </div>
+
+    <div class="container">
+        <!-- LEFT PANEL - FORM -->
+        <div class="panel">
+            <h2>Build Your Template</h2>
+            
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab('product')">Product Update</button>
+                <button class="tab-btn" onclick="switchTab('announcement')">Announcement</button>
+                <button class="tab-btn" onclick="switchTab('custom')">Custom</button>
+            </div>
+
+            <div class="success-msg" id="successMsg">✓ Template copied to clipboard!</div>
+
+            <!-- HEADER SECTION -->
+            <div class="form-group">
+                <label>Company/Product Name</label>
+                <input type="text" id="companyName" placeholder="e.g., CuriousJr" value="CuriousJr">
+            </div>
+
+            <div class="form-group">
+                <label>Subtitle</label>
+                <input type="text" id="subtitle" placeholder="e.g., Product Updates" value="Product Updates">
+            </div>
+
+            <div class="form-group">
+                <label>Update Period</label>
+                <input type="text" id="updatePeriod" placeholder="e.g., December 2025" value="December 2025">
+            </div>
+
+            <div class="form-group">
+                <label>Company Logo URL</label>
+                <input type="text" id="logoUrl" placeholder="https://example.com/logo.png" value="https://play-lh.googleusercontent.com/a-j4drqyWPtt2LEbDOOunyqcZhUDeWMc6g65yA-2w-ldBPkXDi5T_RLmEIK1-q7ecA">
+            </div>
+
+            <div class="form-group">
+                <label>Header Description</label>
+                <textarea id="headerDesc" placeholder="Brief description...">Quick snapshot of what went live, what's in motion and what's coming up next across the CuriousJr ecosystem.</textarea>
+            </div>
+
+            <!-- SECTIONS -->
+            <div class="section-title">Email Sections</div>
+
+            <div class="form-group">
+                <label>Section 1 Title</label>
+                <input type="text" id="sec1Title" placeholder="✅ What Got Done" value="✅ What Got Done">
+            </div>
+
+            <div class="form-group">
+                <label>Section 1 Description</label>
+                <textarea id="sec1Desc" placeholder="Description...">Features that shipped in this sprint. See what is now live.</textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Section 2 Title</label>
+                <input type="text" id="sec2Title" placeholder="🔄 Work in Progress" value="🔄 Work in Progress">
+            </div>
+
+            <div class="form-group">
+                <label>Section 2 Description</label>
+                <textarea id="sec2Desc" placeholder="Description...">Active development and QA across multiple initiatives.</textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Section 3 Title</label>
+                <input type="text" id="sec3Title" placeholder="📅 Coming Up Next" value="📅 Coming Up Next">
+            </div>
+
+            <div class="form-group">
+                <label>Section 3 Description</label>
+                <textarea id="sec3Desc" placeholder="Description...">Future roadmap items planned for next phase.</textarea>
+            </div>
+
+            <!-- FOOTER -->
+            <div class="section-title">Footer</div>
+
+            <div class="form-group">
+                <label>Your Name</label>
+                <input type="text" id="footerName" placeholder="Abhijeet Bhatt" value="Abhijeet Bhatt">
+            </div>
+
+            <div class="form-group">
+                <label>Your Title</label>
+                <input type="text" id="footerTitle" placeholder="Product Manager" value="Product Manager">
+            </div>
+
+            <div class="form-group">
+                <label>Contact (Phone/Email)</label>
+                <input type="text" id="footerContact" placeholder="📞 9602887557" value="📞 9602887557">
+            </div>
+
+            <button class="btn btn-primary" onclick="generateTemplate()">📧 Generate Template</button>
+            <button class="btn btn-secondary export-btn" style="margin-top: 12px;" onclick="copyToClipboard()">📋 Copy HTML</button>
+        </div>
+
+        <!-- RIGHT PANEL - PREVIEW -->
+        <div class="panel">
+            <h2>Live Preview</h2>
+            <div class="preview">
+                <div id="emailPreview" class="email-preview">
+                    <div class="preview-header">
+                        <h3 id="previewCompany">CuriousJr</h3>
+                        <p id="previewSubtitle">Product Updates • December 2025</p>
+                    </div>
+                    <div class="preview-content">
+                        <div class="preview-section">
+                            <h4 id="previewSec1Title">✅ What Got Done</h4>
+                            <p id="previewSec1Desc">Features that shipped in this sprint...</p>
+                        </div>
+                        <div class="preview-section">
+                            <h4 id="previewSec2Title">🔄 Work in Progress</h4>
+                            <p id="previewSec2Desc">Active development across initiatives...</p>
+                        </div>
+                        <div class="preview-section">
+                            <h4 id="previewSec3Title">📅 Coming Up Next</h4>
+                            <p id="previewSec3Desc">Future roadmap items...</p>
+                        </div>
+                        <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 20px 0;">
+                        <p style="font-size: 12px; color: #9ca3af; text-align: center;">
+                            <strong id="previewFooterName">Abhijeet Bhatt</strong><br>
+                            <span id="previewFooterTitle">Product Manager</span><br>
+                            <span id="previewFooterContact">📞 9602887557</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let generatedHTML = '';
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            // Load template presets
+            if (tab === 'product') {
+                document.getElementById('companyName').value = 'CuriousJr';
+                document.getElementById('sec1Title').value = '✅ What Got Done';
+                document.getElementById('sec2Title').value = '🔄 Work in Progress';
+                document.getElementById('sec3Title').value = '📅 Coming Up Next';
+            } else if (tab === 'announcement') {
+                document.getElementById('companyName').value = 'Company Name';
+                document.getElementById('sec1Title').value = '📢 Announcement';
+                document.getElementById('sec2Title').value = '🎯 Key Details';
+                document.getElementById('sec3Title').value = '🔗 Next Steps';
+            }
+            updatePreview();
+        }
+
+        function updatePreview() {
+            document.getElementById('previewCompany').textContent = document.getElementById('companyName').value || 'Company';
+            document.getElementById('previewSubtitle').textContent = document.getElementById('subtitle').value + ' • ' + document.getElementById('updatePeriod').value;
+            document.getElementById('previewSec1Title').textContent = document.getElementById('sec1Title').value;
+            document.getElementById('previewSec1Desc').textContent = document.getElementById('sec1Desc').value;
+            document.getElementById('previewSec2Title').textContent = document.getElementById('sec2Title').value;
+            document.getElementById('previewSec2Desc').textContent = document.getElementById('sec2Desc').value;
+            document.getElementById('previewSec3Title').textContent = document.getElementById('sec3Title').value;
+            document.getElementById('previewSec3Desc').textContent = document.getElementById('sec3Desc').value;
+            document.getElementById('previewFooterName').textContent = document.getElementById('footerName').value;
+            document.getElementById('previewFooterTitle').textContent = document.getElementById('footerTitle').value;
+            document.getElementById('previewFooterContact').textContent = document.getElementById('footerContact').value;
+        }
+
+        document.querySelectorAll('input, textarea').forEach(el => {
+            el.addEventListener('input', updatePreview);
+        });
+
+        function generateTemplate() {
+            const company = document.getElementById('companyName').value;
+            const subtitle = document.getElementById('subtitle').value;
+            const period = document.getElementById('updatePeriod').value;
+            const logo = document.getElementById('logoUrl').value;
+            const headerDesc = document.getElementById('headerDesc').value;
+            const footerName = document.getElementById('footerName').value;
+            const footerTitle = document.getElementById('footerTitle').value;
+            const footerContact = document.getElementById('footerContact').value;
+
+            generatedHTML = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${company} - ${period}</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f5f5f5; }
+        table { border-collapse: collapse; }
+        img { max-width: 100%; }
+        .container { max-width: 640px; margin: 32px auto; }
+    </style>
+</head>
+<body style="margin: 0; padding: 32px 12px; background-color: #f5f5f5;">
+    <table role="presentation" width="100%" style="max-width: 640px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(15, 23, 42, 0.12);">
+        <tr>
+            <td style="background: linear-gradient(135deg, #ff6b35 0%, #ff8c42 100%); padding: 32px 28px 28px 28px; color: #ffffff;">
+                <table width="100%">
+                    <tr>
+                        <td align="left" style="vertical-align: middle;">
+                            <img src="${logo}" alt="Logo" style="width: 40px; height: 40px; border-radius: 8px; margin: 0; padding: 0;">
+                            <span style="margin-left: 14px; vertical-align: middle; font-size: 20px; font-weight: 700;">${company}</span>
+                        </td>
+                    </tr>
+                </table>
+                <p style="margin-top: 20px; font-size: 14px; line-height: 1.7; opacity: 0.95; margin-bottom: 0;">${headerDesc}</p>
+            </td>
+        </tr>
+        <tr>
+            <td style="padding: 28px 28px 12px 28px;">
+                <h2 style="font-size: 18px; font-weight: 700; color: #111827; margin-bottom: 12px;">${document.getElementById('sec1Title').value}</h2>
+                <p style="font-size: 13px; color: #6b7280; margin: 0;">${document.getElementById('sec1Desc').value}</p>
+            </td>
+        </tr>
+        <tr>
+            <td style="padding: 28px 28px 12px 28px;">
+                <h2 style="font-size: 18px; font-weight: 700; color: #111827; margin-bottom: 12px;">${document.getElementById('sec2Title').value}</h2>
+                <p style="font-size: 13px; color: #6b7280; margin: 0;">${document.getElementById('sec2Desc').value}</p>
+            </td>
+        </tr>
+        <tr>
+            <td style="padding: 28px 28px 12px 28px;">
+                <h2 style="font-size: 18px; font-weight: 700; color: #111827; margin-bottom: 12px;">${document.getElementById('sec3Title').value}</h2>
+                <p style="font-size: 13px; color: #6b7280; margin: 0;">${document.getElementById('sec3Desc').value}</p>
+            </td>
+        </tr>
+        <tr>
+            <td style="background: #0f172a; padding: 16px 20px; color: #9ca3af; font-size: 11px; line-height: 1.5; text-align: center;">
+                <p style="margin: 0 0 8px 0; font-weight: 500;">Thanks and Regards</p>
+                <p style="margin: 0 0 4px 0; font-weight: 600;">${footerName}</p>
+                <p style="margin: 0 0 12px 0;">${footerTitle}</p>
+                <p style="margin: 0;">${footerContact}</p>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>`;
+
+            showSuccess('Template generated! Click "Copy HTML" to copy.');
+        }
+
+        function copyToClipboard() {
+            if (!generatedHTML) {
+                alert('Please generate template first!');
+                return;
+            }
+            navigator.clipboard.writeText(generatedHTML).then(() => {
+                showSuccess('✓ HTML copied to clipboard!');
+            });
+        }
+
+        function showSuccess(msg) {
+            const el = document.getElementById('successMsg');
+            el.textContent = msg;
+            el.style.display = 'block';
+            setTimeout(() => el.style.display = 'none', 3000);
+        }
+
+        updatePreview();
+    </script>
+</body>
+</html>
